@@ -2,10 +2,8 @@
 
 ## 프로젝트 링크
 
-- Repository: <!-- GitHub URL 추가 예정 -->
+- Repository: https://github.com/jasonpark112/finance-coach-agent
 - 6주차 설계 PR 또는 design.md: [design.md](./design.md)
-
----
 
 ## 구현한 Agent
 
@@ -73,14 +71,18 @@ streamlit run app.py
 
 브라우저에서 `localhost:8501` 자동 오픈. 지출 차트·종목 시세·Agent 채팅을 한 화면에서 확인 가능. 대시보드 구조는 향후 Finance Analyst / Market Research Agent를 병렬로 운영할 때 각 Agent의 실행 상태를 실시간으로 시각화하는 기반이 된다.
 
+## 대시보드 미리보기
+
+![대시보드](assets/dashboard.png)
+
 ### CLI
 
 ```bash
 # 단일 입력
-python src/main.py "이번 달 지출 분석해줘"
+python src/cli.py "이번 달 지출 분석해줘"
 
 # 대화형 모드
-python src/main.py
+python src/cli.py
 ```
 
 > 실행은 반드시 `finance-coach-agent/` 루트에서 진행해야 `.env`를 올바르게 로드합니다.
@@ -207,9 +209,9 @@ Step 2 → 최종 답변
 
 | 요청 | 설계 예상 흐름 | 실제 흐름 | 일치 여부 |
 |------|--------------|-----------|---------|
-| 소비 분석 | get_transactions → analyze_spending | get_transactions → analyze_spending | ✅ |
-| 투자 추천 | get_transactions → analyze_spending → get_stock_price → get_news_summary → generate_recommendation | 동일 (Step 3에서 시세·뉴스 병렬 호출) | ✅ |
-| 종목 리서치 | get_stock_price → get_news_summary | get_stock_price + get_news_summary 동시 호출 | ✅ |
+| 소비 분석 | get_transactions → analyze_spending | get_transactions → analyze_spending | 일치 |
+| 투자 추천 | get_transactions → analyze_spending → get_stock_price → get_news_summary → generate_recommendation | 동일 (Step 3에서 시세·뉴스 병렬 호출) | 일치 |
+| 종목 리서치 | get_stock_price → get_news_summary | get_stock_price + get_news_summary 동시 호출 | 일치 |
 
 ### 주요 관찰 사항
 
@@ -224,11 +226,11 @@ Step 2 → 최종 답변
 
 | # | 기준 | 결과 | 근거 |
 |---|------|------|------|
-| 1 | 소비 분석 요청 시 `get_transactions` → `analyze_spending` 순서로 호출 | ✅ 통과 | 예시 1·2 로그에서 Step 1→2 순서 확인 |
-| 2 | 투자 추천 시 `get_stock_price`와 `get_news_summary`를 모두 호출 | ✅ 통과 | 예시 2 Step 3 로그에서 두 Tool 모두 호출 확인 |
-| 3 | Tool 실패 시 재시도 또는 fallback Tool로 전환 | ✅ 구현 | `ok=false` 반환 시 Claude가 에러 코드를 읽고 대안 판단하도록 설계. `TOOL_FUNCTIONS` 에러 핸들링 코드로 확인 |
-| 4 | 최종 응답에 여유 자금 금액과 추천 종목명 포함 | ✅ 통과 | 예시 2 출력에 여유 자금 2,515,600원, TIGER 미국S&P500 등 포함 확인 |
-| 5 | 모든 요청이 15 step 이내에 종료 | ✅ 통과 | 예시 1: 3step, 예시 2: 5step, 예시 3: 2step |
+| 1 | 소비 분석 요청 시 `get_transactions` → `analyze_spending` 순서로 호출 |  통과 | 예시 1·2 로그에서 Step 1→2 순서 확인 |
+| 2 | 투자 추천 시 `get_stock_price`와 `get_news_summary`를 모두 호출 |  통과 | 예시 2 Step 3 로그에서 두 Tool 모두 호출 확인 |
+| 3 | Tool 실패 시 재시도 또는 fallback Tool로 전환 |  구현 | `ok=false` 반환 시 Claude가 에러 코드를 읽고 대안 판단하도록 설계. `TOOL_FUNCTIONS` 에러 핸들링 코드로 확인 |
+| 4 | 최종 응답에 여유 자금 금액과 추천 종목명 포함 |  통과 | 예시 2 출력에 여유 자금 2,515,600원, TIGER 미국S&P500 등 포함 확인 |
+| 5 | 모든 요청이 15 step 이내에 종료 |  통과 | 예시 1: 3step, 예시 2: 5step, 예시 3: 2step |
 
 ---
 
@@ -246,14 +248,14 @@ Step 2 → 최종 답변
 
 ### Phase 1 — 로컬 고도화 (진행 중)
 
-- ✅ **Streamlit 웹 대시보드** 구현 완료
+-  **Streamlit 웹 대시보드** 구현 완료
   - 지출 카테고리별 바 차트 (기간 전환 가능)
   - 관심 종목 시세 카드 (watchlist 선택)
   - Agent 실행 흐름 실시간 표시 (Step별 Tool 호출 현황)
   - 채팅으로 직접 질문·의논하는 혼합형
-- ✅ **Mock 데이터 보강** 완료 (2달치, 27건, 카테고리 9개)
-- ✅ **메타데이터 추가** 완료 (tool_sequence, data_source, fallback 여부, 생성 시각)
-- ⏳ **실제 API 연동** (예정)
+-  **Mock 데이터 보강** 완료 (2달치, 27건, 카테고리 9개)
+-  **메타데이터 추가** 완료 (tool_sequence, data_source, fallback 여부, 생성 시각)
+-  **실제 API 연동** (예정)
   - `get_transactions`: 오픈뱅킹 API (금융결제원)
   - `get_stock_price`: 한국투자증권 KIS Open API
   - `get_news_summary`: 네이버 뉴스 검색 API
