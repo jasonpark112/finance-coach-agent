@@ -65,13 +65,13 @@ cp .env.example .env
 # .env 파일에 ANTHROPIC_API_KEY 입력
 ```
 
-### 웹 대시보드 (권장)
+### 웹 대시보드 (향후 Multi-Agent 확장 기반)
 
 ```bash
 streamlit run app.py
 ```
 
-브라우저에서 `localhost:8501` 자동 오픈. 지출 차트·종목 시세·Agent 채팅을 한 화면에서 확인 가능.
+브라우저에서 `localhost:8501` 자동 오픈. 지출 차트·종목 시세·Agent 채팅을 한 화면에서 확인 가능. 대시보드 구조는 향후 Finance Analyst / Market Research Agent를 병렬로 운영할 때 각 Agent의 실행 상태를 실시간으로 시각화하는 기반이 된다.
 
 ### CLI
 
