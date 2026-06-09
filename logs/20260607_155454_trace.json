@@ -1,0 +1,100 @@
+{
+  "run_id": "20260607_155454",
+  "user_message": "이번 달 내가 어디에 제일 많이 썼어 카테고리별로 정리해줘",
+  "started_at": "2026-06-07T15:54:54.605090",
+  "finished_at": "2026-06-07T15:55:42.026355",
+  "total_latency_ms": 47421,
+  "stop_reason": "end_turn",
+  "total_steps": 3,
+  "fallback_occurred": false,
+  "data_source": "mock",
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-sonnet-4-6"
+  },
+  "prompt": {
+    "version": "v:e1c441f1"
+  },
+  "safety": {
+    "masked_fields": [
+      "user_id",
+      "resTrHistoryList",
+      "resAfterTranBalance",
+      "resAccountBalance",
+      "resWithdrawalAmt"
+    ],
+    "excluded_fields": [
+      "transactions (analyze_spending input)"
+    ]
+  },
+  "usage": {
+    "input_tokens": 16005,
+    "output_tokens": 3833,
+    "total_tokens": 19838,
+    "estimated_cost_usd": 0.10551
+  },
+  "steps": [
+    {
+      "step": 1,
+      "tool_calls": [
+        {
+          "tool": "get_transactions",
+          "input": {
+            "user_id": "u***",
+            "period": "2026-04"
+          },
+          "ok": true,
+          "result": {
+            "ok": true,
+            "data": {
+              "commStartDate": "20260401",
+              "commEndDate": "20260430",
+              "resTrHistoryList": "[30 items omitted]"
+            },
+            "error": null
+          },
+          "error": null,
+          "called_at": "2026-06-07T15:54:57.619338",
+          "latency_ms": 0
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool_calls": [
+        {
+          "tool": "analyze_spending",
+          "input": {
+            "transactions": "[30 items omitted]"
+          },
+          "ok": true,
+          "result": {
+            "ok": true,
+            "data": {
+              "fixed": 630900,
+              "variable": 588500,
+              "total": 1219400,
+              "surplus": 2280600,
+              "monthly_income": 3500000,
+              "breakdown": {
+                "식비": 273000,
+                "교통": 49500,
+                "구독": 30900,
+                "쇼핑": 254000,
+                "의료": 12000,
+                "월세": 500000,
+                "통신비": 55000,
+                "보험": 45000
+              }
+            },
+            "error": null
+          },
+          "error": null,
+          "called_at": "2026-06-07T15:55:27.094604",
+          "latency_ms": 0
+        }
+      ]
+    }
+  ],
+  "final_answer": "분석 완료! 2026년 4월 지출 내역을 깔끔하게 정리해드릴게요 📊\n\n---\n\n## 📅 2026년 4월 소비 분석 결과\n\n### 💰 전체 지출 요약\n| 구분 | 금액 |\n|------|------|\n| 총 지출 | **1,219,400원** |\n| 고정비 | 630,900원 |\n| 변동비 | 588,500원 |\n| 추정 여유 자금 | **2,280,600원** |\n\n---\n\n### 📂 카테고리별 지출 (많이 쓴 순)\n\n| 순위 | 카테고리 | 금액 | 비중 | 주요 내역 |\n|------|---------|------|------|-----------|\n| 🥇 1위 | 🏠 월세 | **500,000원** | 41.0% | 4월 월세 |\n| 🥈 2위 | 🍽️ 식비 | **273,000원** | 22.4% | 스타벅스, 배민, 식당 등 |\n| 🥉 3위 | 🛍️ 쇼핑 | **254,000원** | 20.8% | 쿠팡, 무신사, 올리브영 |\n| 4위 | 📱 통신비 | **55,000원** | 4.5% | SKT |\n| 5위 | 🚌 교통 | **49,500원** | 4.1% | 지하철, KTX |\n| 6위 | 🔒 보험 | **45,000원** | 3.7% | 삼성화재 |\n| 7위 | 📺 구독 | **30,900원** | 2.5% | 넷플릭스, 유튜브 프리미엄 |\n| 8위 | 🏥 의료 | **12,000원** | 1.0% | 강남내과 |\n\n---\n\n### 💡 코치의 한마디\n\n- **식비(273,000원)** 중 카페·배달 지출이 꽤 높아요. 스타벅스만 5번 방문! ☕\n- **쇼핑(254,000원)** 은 쿠팡 2건(156,000원)이 절반 이상을 차지했어요.\n- 월세·통신·보험 등 **고정비 합계 630,900원** 은 잘 관리되고 있는 편입니다.\n\n> 혹시 이 여유 자금으로 **투자 추천**도 받아보시겠어요? 지출 데이터 기반으로 맞춤 추천해드릴 수 있어요! 📈"
+}

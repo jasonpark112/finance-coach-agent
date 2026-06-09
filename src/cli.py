@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 from agent_loop import run_agent
 
 load_dotenv()
+# .env 파일을 읽어서 os.environ에 등록합니다.
+# os, sys : 파이썬 표준 라이브러리이다. os 는 환경 변수 확인에, sys는 명령줄 인수 처리 및 프로그램 강제 종료에 사용
 
-
+#  -> None: 반환값이 없음을 명시하는 타입 힌트입니다.
 def main() -> None:
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("오류: ANTHROPIC_API_KEY가 설정되지 않았습니다.")
@@ -36,5 +38,6 @@ def main() -> None:
         print()
 
 
+# 파이썬의 관용구이다. 이 파일이 터미널에서 직접 실행(python main.py)될 때만 main() 함수를 실행하라는 의미
 if __name__ == "__main__":
     main()
