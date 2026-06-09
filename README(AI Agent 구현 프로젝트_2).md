@@ -1,4 +1,4 @@
-# 8주차 AI Agent Observability
+# AI Agent Observability
 
 ## 프로젝트 링크
 
