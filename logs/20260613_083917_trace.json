@@ -1,0 +1,67 @@
+{
+  "run_id": "20260613_083917",
+  "user_message": "KODEX 국내채권 주가 알려줘",
+  "started_at": "2026-06-13T08:39:17.645236",
+  "finished_at": "2026-06-13T08:39:20.662996",
+  "total_latency_ms": 3017,
+  "stop_reason": "end_turn",
+  "total_steps": 2,
+  "fallback_occurred": true,
+  "data_source": "mock",
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-haiku-4-5-20251001"
+  },
+  "prompt": {
+    "version": "v:e1c441f1"
+  },
+  "safety": {
+    "masked_fields": [
+      "user_id",
+      "resTrHistoryList",
+      "resAfterTranBalance",
+      "resAccountBalance",
+      "resWithdrawalAmt"
+    ],
+    "excluded_fields": [
+      "transactions (analyze_spending input)"
+    ]
+  },
+  "usage": {
+    "input_tokens": 6195,
+    "output_tokens": 229,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "total_tokens": 6424,
+    "estimated_cost_usd": 0.00734
+  },
+  "steps": [
+    {
+      "step": 1,
+      "tool_calls": [
+        {
+          "tool": "get_stock_price",
+          "input": {
+            "symbol": "KODEX 국내채권"
+          },
+          "ok": false,
+          "result": {
+            "ok": false,
+            "data": null,
+            "error": {
+              "code": "SYMBOL_NOT_FOUND",
+              "message": "종목 'KODEX 국내채권'을 찾을 수 없습니다. 지원 종목: ['005930', 'TIGER 미국S&P500', 'KODEX 200', 'TIGER 미국나스닥100']"
+            }
+          },
+          "error": {
+            "code": "SYMBOL_NOT_FOUND",
+            "message": "종목 'KODEX 국내채권'을 찾을 수 없습니다. 지원 종목: ['005930', 'TIGER 미국S&P500', 'KODEX 200', 'TIGER 미국나스닥100']"
+          },
+          "called_at": "2026-06-13T08:39:19.102197",
+          "latency_ms": 0
+        }
+      ]
+    }
+  ],
+  "final_answer": "죄송합니다. KODEX 국내채권은 현재 지원하지 않는 종목입니다.\n\n**현재 조회 가능한 종목:**\n- 005930 (삼성전자)\n- TIGER 미국S&P500\n- KODEX 200\n- TIGER 미국나스닥100\n\n위 종목 중에서 조회를 원하시거나, 다른 도움이 필요하시면 말씀해주세요! 😊"
+}

@@ -119,7 +119,7 @@ TOOL_DEFINITIONS = [
 MAX_STEPS = 15
 # AI 가 도구를 사용하고 생각하는 단계를 최대 15번으로 제한한다.
 LOOP_DETECT_THRESHOLD = 3  # 동일 Tool·인자 반복 횟수 초과 시 중단, 똑같은 인자로 똑같은 도구를 3번 이상 연속 호출하면, 에이전트가 길을 잃었다고 판단하고 강제 중단
-MODEL_ID = "claude-sonnet-4-6"
+MODEL_ID = "claude-haiku-4-5-20251001"
 
 
 # ──────────────────────────────────────────────
@@ -250,8 +250,10 @@ def run_agent(user_message: str, on_step=None) -> dict:
     tool_calls:    list[dict] = []
     steps_trace:   list[dict] = []  # step별로 그룹화된 trace
     fallback_occurred = False
-    total_input_tokens  = 0  # 전체 스텝 누산 input token
-    total_output_tokens = 0  # 전체 스텝 누산 output token
+    total_input_tokens          = 0  # 전체 스텝 누산 input token
+    total_output_tokens         = 0  # 전체 스텝 누산 output token
+    total_cache_creation_tokens = 0  # 캐시에 쓴 token (cache write)
+    total_cache_read_tokens     = 0  # 캐시에서 읽은 token (cache read)
 
     header = f"\n{'='*60}\n사용자: {user_message}\n{'='*60}"
     print(header)
@@ -297,14 +299,18 @@ def run_agent(user_message: str, on_step=None) -> dict:
                 "masked_fields":   ["user_id", "resTrHistoryList", "resAfterTranBalance", "resAccountBalance", "resWithdrawalAmt"],
                 "excluded_fields": ["transactions (analyze_spending input)"],
             },
-            # claude-sonnet-4-6 단가: input $3/M tokens, output $15/M tokens
+            # claude-haiku-4-5 단가: input $1/M, cache_write $1.25/M, cache_read $0.10/M, output $5/M
             "usage": {
-                "input_tokens":        total_input_tokens,
-                "output_tokens":       total_output_tokens,
-                "total_tokens":        total_input_tokens + total_output_tokens,
-                "estimated_cost_usd":  round(
-                    total_input_tokens  * 3  / 1_000_000 +
-                    total_output_tokens * 15 / 1_000_000,
+                "input_tokens":          total_input_tokens,
+                "output_tokens":         total_output_tokens,
+                "cache_creation_tokens": total_cache_creation_tokens,
+                "cache_read_tokens":     total_cache_read_tokens,
+                "total_tokens":          total_input_tokens + total_output_tokens,
+                "estimated_cost_usd":    round(
+                    total_input_tokens          * 1    / 1_000_000 +
+                    total_cache_creation_tokens * 1.25 / 1_000_000 +
+                    total_cache_read_tokens     * 0.10 / 1_000_000 +
+                    total_output_tokens         * 5    / 1_000_000,
                     6
                 ),
             },
@@ -332,6 +338,7 @@ def run_agent(user_message: str, on_step=None) -> dict:
         response = client.messages.create(
             model=MODEL_ID,
             max_tokens=8192,
+            cache_control={"type": "ephemeral"},
             system=SYSTEM_PROMPT,
             tools=TOOL_DEFINITIONS,
             messages=messages,
@@ -340,8 +347,10 @@ def run_agent(user_message: str, on_step=None) -> dict:
         messages.append({"role": "assistant", "content": response.content})
 
         # 매 스텝 token 사용량 누산 (여러 스텝에 걸친 총 사용량을 _finish에서 집계)
-        total_input_tokens  += response.usage.input_tokens
-        total_output_tokens += response.usage.output_tokens
+        total_input_tokens          += response.usage.input_tokens
+        total_output_tokens         += response.usage.output_tokens
+        total_cache_creation_tokens += getattr(response.usage, "cache_creation_input_tokens", 0)
+        total_cache_read_tokens     += getattr(response.usage, "cache_read_input_tokens", 0)
 
         # Claude가 응답을 생성하다가 8192토큰을 넘으면 응답이 잘린 채로 끝난다. 잘린 응답을 그냥 쓰면 불완전한 답변이 나오니까 즉시 종료하고 메시지를 반환한다.
         # ── 종료: 출력 토큰 한도 초과 ───────────
