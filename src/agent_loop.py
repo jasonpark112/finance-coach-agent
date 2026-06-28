@@ -9,6 +9,7 @@ from pathlib import Path
 import anthropic
 from tools import TOOL_FUNCTIONS
 from prompts import SYSTEM_PROMPT
+from guardrails import check_tool_guardrail, check_input_guardrail
 
 # 로그 파일 경로: 프로젝트 루트의 logs/ 디렉터리
 LOGS_DIR = Path(__file__).parent.parent / "logs"
@@ -191,6 +192,10 @@ def _save_trace(path: Path, trace: dict) -> None:
 
 # 미리 정의된 TOOL_FUNCTIONS 맵에서 실제 파이썬 함수를 찾아 실행한다. 만약 함수 실행 중 에러가 나면 프로그램이 튕기지 않도록 try-except로 감싸 에러 메시지를 안전하게 딕셔너리 형태로 반환한다/
 def _execute_tool(tool_name: str, tool_input: dict) -> dict:
+    blocked = check_tool_guardrail(tool_name, tool_input)
+    if blocked:
+        return blocked
+
     fn = TOOL_FUNCTIONS.get(tool_name)
     if fn is None:
         return {
@@ -327,6 +332,11 @@ def run_agent(user_message: str, on_step=None) -> dict:
         print(f"[트레이스 저장] {trace_path}")
 
         return {"answer": final_answer, "metadata": metadata}
+
+    # ── Input Guardrail ──────────────────────────
+    input_block = check_input_guardrail(user_message)
+    if input_block:
+        return _finish("input_blocked", input_block["message"])
 
 # 매 루프마다 step을 1 올리고 Claude를 호출한다. messages에는 지금까지의 대화 기록이 전부 담겨있어서 Claude가 이전 맥락을 기억할 수 있습니다.
 # 응답이 오면 즉시 messages에 추가해서 다음 루프에서도 Claude가 자신이 뭘 했는지 알 수 있게 한다.
